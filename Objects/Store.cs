@@ -144,6 +144,90 @@ namespace ShoeStores.Objects
       return foundStore;
     }
 
+    public void AddBrand(Brand newBrand)
+    {
+      SqlConnection conn = DB.Connection();
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("INSERT INTO stores_brands (brand_id, store_id) VALUES (@BrandId, @StoreId);", conn);
+
+      SqlParameter brandIdParameter = new SqlParameter();
+      brandIdParameter.ParameterName = "@BrandId";
+      brandIdParameter.Value = newBrand.GetId();
+      cmd.Parameters.Add(brandIdParameter);
+
+      SqlParameter storeIdParameter = new SqlParameter();
+      storeIdParameter.ParameterName = "@StoreId";
+      storeIdParameter.Value = this.GetId();
+      cmd.Parameters.Add(storeIdParameter);
+
+      cmd.ExecuteNonQuery();
+
+      if (conn != null)
+      {
+        conn.Close();
+      }
+    }
+
+    public List<Brand> GetBrands()
+    {
+      SqlConnection conn = DB.Connection();
+      SqlDataReader rdr = null;
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("SELECT brand_id FROM stores_brands WHERE store_id = @StoreId;", conn);
+
+      SqlParameter storeIdParameter = new SqlParameter();
+      storeIdParameter.ParameterName = "@StoreId";
+      storeIdParameter.Value = this.GetId();
+      cmd.Parameters.Add(storeIdParameter);
+
+      rdr = cmd.ExecuteReader();
+
+      List<int> brandIds = new List<int> {};
+
+      while (rdr.Read())
+      {
+        int brandId = rdr.GetInt32(0);
+        brandIds.Add(brandId);
+      }
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+
+      List<Brand> brands = new List<Brand> {};
+
+      foreach (int brandId in brandIds)
+      {
+        SqlDataReader queryReader = null;
+        SqlCommand brandQuery = new SqlCommand("SELECT * FROM brands WHERE id = @BrandId;", conn);
+
+        SqlParameter brandIdParameter = new SqlParameter();
+        brandIdParameter.ParameterName = "@BrandId";
+        brandIdParameter.Value = brandId;
+        brandQuery.Parameters.Add(brandIdParameter);
+
+        queryReader = brandQuery.ExecuteReader();
+        while (queryReader.Read())
+        {
+          int thisBrandId = queryReader.GetInt32(0);
+          string brandName = queryReader.GetString(1);
+          Brand foundBrand = new Brand(brandName, thisBrandId);
+          brands.Add(foundBrand);
+        }
+        if (queryReader != null)
+        {
+          queryReader.Close();
+        }
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+      return brands;
+    }
+
     public static void DeleteAll()
     {
       SqlConnection conn = DB.Connection();
