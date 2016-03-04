@@ -175,7 +175,7 @@ namespace ShoeStores.Objects
       SqlDataReader rdr = null;
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("SELECT brand_id FROM stores_brands WHERE store_id = @StoreId;", conn);
+      SqlCommand cmd = new SqlCommand("SELECT brands.* FROM stores JOIN stores_brands ON (stores.id = stores_brands.store_id) JOIN brands ON (stores_brands.brand_id = brands.id) WHERE stores.id = @StoreId;", conn);
 
       SqlParameter storeIdParameter = new SqlParameter();
       storeIdParameter.ParameterName = "@StoreId";
@@ -184,47 +184,26 @@ namespace ShoeStores.Objects
 
       rdr = cmd.ExecuteReader();
 
-      List<int> brandIds = new List<int> {};
+      List<Brand> brands = new List<Brand> {};
 
       while (rdr.Read())
       {
-        int brandId = rdr.GetInt32(0);
-        brandIds.Add(brandId);
+        int thisBrandId = rdr.GetInt32(0);
+        string brandName = rdr.GetString(1);
+        Brand foundBrand = new Brand(brandName, thisBrandId);
+        brands.Add(foundBrand);
       }
+
       if (rdr != null)
       {
         rdr.Close();
       }
 
-      List<Brand> brands = new List<Brand> {};
-
-      foreach (int brandId in brandIds)
-      {
-        SqlDataReader queryReader = null;
-        SqlCommand brandQuery = new SqlCommand("SELECT * FROM brands WHERE id = @BrandId;", conn);
-
-        SqlParameter brandIdParameter = new SqlParameter();
-        brandIdParameter.ParameterName = "@BrandId";
-        brandIdParameter.Value = brandId;
-        brandQuery.Parameters.Add(brandIdParameter);
-
-        queryReader = brandQuery.ExecuteReader();
-        while (queryReader.Read())
-        {
-          int thisBrandId = queryReader.GetInt32(0);
-          string brandName = queryReader.GetString(1);
-          Brand foundBrand = new Brand(brandName, thisBrandId);
-          brands.Add(foundBrand);
-        }
-        if (queryReader != null)
-        {
-          queryReader.Close();
-        }
-      }
       if (conn != null)
       {
         conn.Close();
       }
+
       return brands;
     }
 

@@ -175,7 +175,7 @@ namespace ShoeStores.Objects
       SqlDataReader rdr = null;
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("SELECT store_id FROM stores_brands WHERE brand_id = @BrandId;", conn);
+      SqlCommand cmd = new SqlCommand("SELECT stores.* FROM brands JOIN stores_brands ON (brands.id = stores_brands.brand_id) JOIN stores ON (stores_brands.store_id = stores.id) WHERE brands.id = @BrandId;", conn);
 
       SqlParameter brandIdParameter = new SqlParameter();
       brandIdParameter.ParameterName = "@BrandId";
@@ -184,47 +184,26 @@ namespace ShoeStores.Objects
 
       rdr = cmd.ExecuteReader();
 
-      List<int> storeIds = new List<int> {};
+      List<Store> stores = new List<Store> {};
 
       while (rdr.Read())
       {
-        int storeId = rdr.GetInt32(0);
-        storeIds.Add(storeId);
+        int thisStoreId = rdr.GetInt32(0);
+        string storeName = rdr.GetString(1);
+        Store foundStore = new Store(storeName, thisStoreId);
+        stores.Add(foundStore);
       }
+
       if (rdr != null)
       {
         rdr.Close();
       }
 
-      List<Store> stores = new List<Store> {};
-
-      foreach (int storeId in storeIds)
-      {
-        SqlDataReader queryReader = null;
-        SqlCommand storeQuery = new SqlCommand("SELECT * FROM stores WHERE id = @StoreId;", conn);
-
-        SqlParameter storeIdParameter = new SqlParameter();
-        storeIdParameter.ParameterName = "@StoreId";
-        storeIdParameter.Value = storeId;
-        storeQuery.Parameters.Add(storeIdParameter);
-
-        queryReader = storeQuery.ExecuteReader();
-        while (queryReader.Read())
-        {
-          int thisStoreId = queryReader.GetInt32(0);
-          string storeName = queryReader.GetString(1);
-          Store foundStore = new Store(storeName, thisStoreId);
-          stores.Add(foundStore);
-        }
-        if (queryReader != null)
-        {
-          queryReader.Close();
-        }
-      }
       if (conn != null)
       {
         conn.Close();
       }
+
       return stores;
     }
 
