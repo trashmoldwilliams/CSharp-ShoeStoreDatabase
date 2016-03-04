@@ -6,7 +6,7 @@ using System.Data.SqlClient;
 
 namespace ShoeStores.Objects
 {
-  public class StoreTest : IDisposable
+  public class BrandTest : IDisposable
   {
     public void BrandTestDB()
     {
