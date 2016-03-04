@@ -1,0 +1,29 @@
+<h1>Stores</h1>
+@if (@Model["stores"].Count == 0)
+{
+  <p>There are no added stores.</p>
+}
+<ul>
+  @foreach (var store in @Model["stores"])
+  {
+    <li>
+      <a href="/stores/@store.GetId()">@store.GetName()</a> |
+      <a href="/store/@store.GetId()/add">Add</a> |
+      <a href="/store/edit/@store.GetId()">Edit</a>
+      <form action="/store/delete/@store.GetId()" method="post">
+        <input type="hidden" name="_method" value="DELETE">
+        <button type="submit">Delete</button>
+      </form>
+    </li>
+  }
+</ul>
+<h4><a href="/">Return Home</a></h4>
+<h4><a href="/brands">View Brands</a></h4>
+<hr />
+<h3>Add a new store</h3>
+<form action='/stores/new' method="post">
+  <label for="name">Name:</label>
+  <input id="name" name="name" type="text">
+  <br>
+  <button type="submit">Add new store</button>
+</form>
