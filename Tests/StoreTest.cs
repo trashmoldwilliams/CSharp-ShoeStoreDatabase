@@ -86,6 +86,7 @@ namespace ShoeStores.Objects
       //Assert
       Assert.Equal(testList, result);
     }
+
     [Fact]
     public void Test_GetBrands_ReturnsAllStoreBrands()
     {
@@ -110,8 +111,51 @@ namespace ShoeStores.Objects
       Assert.Equal(resultList, compareList);
     }
 
+    [Fact]
+    public void Test_Update_UpdatesStoreInDataBase()
+    {
+      var storeNameOne = "Target";
+      var testStore = new Store(storeNameOne);
+      testStore.Save();
+
+      var storeNameTwo = "Macy's";
+      testStore.Update(storeNameTwo);
+
+      Store result = new Store(testStore.GetName());
+
+      Assert.Equal(result.GetName(), storeNameTwo);
+    }
+
+    [Fact]
+    public void Test_Delete_DeletesStoreFromDatabase()
+    {
+
+      string nameOne = "Huckleberry Finn";
+      Brand testBrand = new Brand(nameOne);
+      testBrand.Save();
+
+      Store testStore1 = new Store("Target");
+      testStore1.Save();
+      Store testStore2 = new Store("Macy's");
+      testStore2.Save();
+
+      testBrand.AddStore(testStore1);
+      testBrand.AddStore(testStore2);
+
+      testStore2.Delete();
+
+      List<Store> resultStores = testBrand.GetStores();
+      List<Store> testStoreList = new List<Store> {testStore1};
+
+      List<Store> storesList = Store.GetAll();
+
+      Assert.Equal(testStoreList, storesList);
+      Assert.Equal(testStoreList, resultStores);
+    }
+
     public void Dispose()
     {
+      Brand.DeleteAll();
       Store.DeleteAll();
     }
   }

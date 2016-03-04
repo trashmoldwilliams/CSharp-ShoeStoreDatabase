@@ -114,6 +114,7 @@ namespace ShoeStores.Objects
     public void Dispose()
     {
       Brand.DeleteAll();
+      Store.DeleteAll();
     }
   }
 }

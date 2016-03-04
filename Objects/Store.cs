@@ -228,6 +228,52 @@ namespace ShoeStores.Objects
       return brands;
     }
 
+    public void Update(string newName)
+   {
+     _store_name = newName;
+     SqlConnection conn = DB.Connection();
+     conn.Open();
+
+     var cmd = new SqlCommand("UPDATE stores SET name = @NewName WHERE id = @StoreId;", conn);
+
+     var newNameParameter = new SqlParameter();
+     newNameParameter.ParameterName = "@NewName";
+     newNameParameter.Value = newName;
+     cmd.Parameters.Add(newNameParameter);
+
+     SqlParameter storeIdParameter = new SqlParameter();
+     storeIdParameter.ParameterName = "@StoreId";
+     storeIdParameter.Value = this.GetId();
+     cmd.Parameters.Add(storeIdParameter);
+
+     cmd.ExecuteNonQuery();
+
+     if (conn != null)
+     {
+       conn.Close();
+     }
+   }
+
+   public void Delete()
+   {
+     SqlConnection conn = DB.Connection();
+     conn.Open();
+
+     var cmd = new SqlCommand("DELETE FROM stores WHERE id = @StoreId;", conn);
+
+     var storeIdParameter = new SqlParameter();
+     storeIdParameter.ParameterName = "@StoreId";
+     storeIdParameter.Value = this.GetId();
+
+     cmd.Parameters.Add(storeIdParameter);
+     cmd.ExecuteNonQuery();
+
+     if (conn != null)
+     {
+       conn.Close();
+     }
+   }
+
     public static void DeleteAll()
     {
       SqlConnection conn = DB.Connection();
