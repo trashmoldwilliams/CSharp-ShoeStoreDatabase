@@ -1,5 +1,5 @@
-<h1>Edit @Model["stores"].GetName()</h1>
-<form action='/stores/new' method="post">
+<h1>Edit @Model.GetName()</h1>
+<form action='/store/edit/@Model.GetId()' method="post">
   <label for="name">Name:</label>
   <input id="name" name="name" type="text">
   <br>

@@ -1,14 +1,14 @@
 <h1>Stores</h1>
-@if (@Model["stores"].Count == 0)
+@if (@Model.Count == 0)
 {
   <p>There are no added stores.</p>
 }
 <ul>
-  @foreach (var store in @Model["stores"])
+  @foreach (var store in @Model)
   {
     <li>
       <a href="/stores/@store.GetId()">@store.GetName()</a> |
-      <a href="/store/@store.GetId()/add">Add</a> |
+      <a href="/store/add/@store.GetId()">Add</a> |
       <a href="/store/edit/@store.GetId()">Edit</a>
       <form action="/store/delete/@store.GetId()" method="post">
         <input type="hidden" name="_method" value="DELETE">

@@ -5,7 +5,7 @@
 }
 else
 {
-  <form>
+  <form action='/brand/add/@Model[brand].GetId()' method="post">
     <label for="id">Store:</label>
     <select name="id">
       @foreach (var store in @Model["stores"])

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Nancy;
 using Nancy.ViewEngines.Razor;
+using ShoeStores.Objects;
 
 namespace ShoeStores
 {
@@ -18,42 +19,77 @@ namespace ShoeStores
         return View["stores.cshtml", AllStores];
       };
 
+      Get["/brands"] = _ => {
+        List<Brand> AllBrands = Brand.GetAll();
+        return View["brands.cshtml", AllBrands];
+      };
+
       Post["/stores/new"] = _ => {
-        Store newStore = new Store(Request.Form["store-name"]);
+        Store newStore = new Store(Request.Form["name"]);
         newStore.Save();
         List<Store> AllStores = Store.GetAll();
         return View["stores.cshtml", AllStores];
       };
 
-      Get["/stores/delete_all"] = _ => {
-        Store.DeleteAll();
-        List<Store> AllStores = Store.GetAll();
-        return View["stores.cshtml", AllStores];
+      Post["/brands/new"] = _ => {
+        Brand newBrand = new Brand(Request.Form["name"]);
+        newBrand.Save();
+        List<Brand> AllBrands = Brand.GetAll();
+        return View["brands.cshtml", AllBrands];
       };
 
       Get["/stores/{id}"] = parameters => {
         Dictionary<string, object> model = new Dictionary<string, object>();
         Store SelectedStore = Store.Find(parameters.id);
-        List<Brand> StoreBrand = SelectedStore.GetBrands();
-        List<Store> AllStores = Store.GetAll();
+        List<Brand> StoreBrands = SelectedStore.GetBrands();
         model.Add("store", SelectedStore);
-        model.Add("brands", StoreBrand);
-        model.Add("stores", AllStores);
-        return View["brands.cshtml", model];
+        model.Add("brands", StoreBrands);
+        return View["store_brands.cshtml", model];
       };
 
-      Post["/stores/{id}/new"] = parameters => {
-        Brand newBrand = new Brand(Request.Form["name"], Request.Form["store-id"]);
-        newBrand.Save();
+      Get["/brands/{id}"] = parameters => {
+        Dictionary<string, object> model = new Dictionary<string, object>();
+        Brand SelectedBrand = Brand.Find(parameters.id);
+        List<Store> BrandStores = SelectedBrand.GetStores();
+        model.Add("brand", SelectedBrand);
+        model.Add("stores", BrandStores);
+        return View["brand_stores.cshtml", model];
+      };
 
+      Get["/store/add/{id}"] = parameters => {
         Dictionary<string, object> model = new Dictionary<string, object>();
         Store SelectedStore = Store.Find(parameters.id);
-        List<Brand> StoreBrand = SelectedStore.GetBrands();
-        List<Store> AllStores = Store.GetAll();
+        List<Brand> AllBrands = Brand.GetAll();
         model.Add("store", SelectedStore);
-        model.Add("brands", StoreBrand);
+        model.Add("brands", AllBrands);
+        return View["add_store.cshtml", model];
+      };
+
+      Post["/store/add/{id}"] = parameters => {
+        Store SelectedStore = Store.Find(parameters.id);
+        Brand SelectedBrand = Brand.Find(Request.Form["id"]);
+        SelectedBrand.AddStore(SelectedStore);
+
+        List<Store> AllStores = Store.GetAll();
+        return View["stores.cshtml", AllStores];
+      };
+
+      Get["/brand/add/{id}"] = parameters => {
+        Dictionary<string, object> model = new Dictionary<string, object>();
+        Brand SelectedBrand = Brand.Find(parameters.id);
+        List<Store> AllStores = Store.GetAll();
+        model.Add("brand", SelectedBrand);
         model.Add("stores", AllStores);
-        return View["brands.cshtml", model];
+        return View["add_brand.cshtml", model];
+      };
+
+      Post["/brand/add/{id}"] = parameters => {
+        Brand SelectedBrand = Brand.Find(parameters.id);
+        Store SelectedStore = Store.Find(Request.Form["id"]);
+        SelectedStore.AddBrand(SelectedBrand);
+
+        List<Brand> AllBrands = Brand.GetAll();
+        return View["brands.cshtml", AllBrands];
       };
 
       Get["/store/edit/{id}"] = parameters => {
@@ -63,7 +99,7 @@ namespace ShoeStores
 
       Patch["/store/edit/{id}"] = parameters => {
         Store SelectedStore = Store.Find(parameters.id);
-        SelectedStore.Update(Request.Form["store-name"]);
+        SelectedStore.Update(Request.Form["name"]);
 
         List<Store> AllStores = Store.GetAll();
         return View["stores.cshtml", AllStores];
@@ -75,39 +111,6 @@ namespace ShoeStores
 
         List<Store> AllStores = Store.GetAll();
         return View["stores.cshtml", AllStores];
-      };
-
-      Get["/brand/edit/{id}"] = parameters => {
-        Brand SelectedBrand = Brand.Find(parameters.id);
-        return View["brand_edit.cshtml", SelectedBrand];
-      };
-
-      Patch["/brand/edit/{id}"] = parameters => {
-        Brand SelectedBrand = Brand.Find(parameters.id);
-        SelectedBrand.Update(Request.Form["brand-name"]);
-
-        Dictionary<string, object> model = new Dictionary<string, object>();
-        Store SelectedStore = Store.Find(SelectedBrand.GetStoreId());
-        List<Brand> StoreBrand = SelectedStore.GetBrands();
-        List<Store> AllStores = Store.GetAll();
-        model.Add("store", SelectedStore);
-        model.Add("brands", StoreBrand);
-        model.Add("stores", AllStores);
-        return View["brands.cshtml", model];
-      };
-
-      Delete["/brand/delete/{id}"] = parameters => {
-        Brand SelectedBrand = Brand.Find(parameters.id);
-        SelectedBrand.Delete();
-
-        Dictionary<string, object> model = new Dictionary<string, object>();
-        Store SelectedStore = Store.Find(SelectedBrand.GetStoreId());
-        List<Brand> StoreBrand = SelectedStore.GetBrands();
-        List<Store> AllStores = Store.GetAll();
-        model.Add("store", SelectedStore);
-        model.Add("brands", StoreBrand);
-        model.Add("stores", AllStores);
-        return View["brands.cshtml", model];
       };
     }
   }
