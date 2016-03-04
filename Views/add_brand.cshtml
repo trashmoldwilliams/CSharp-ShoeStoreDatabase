@@ -1,16 +1,16 @@
-<h1>Add @Model[brand].GetName() to a Store</h1>
+<h1>Add @Model["brand"].GetName() to a Store</h1>
 @if (@Model["stores"].Count == 0)
 {
   <p>There are no added brands.</p>
 }
 else
 {
-  <form action='/brand/add/@Model[brand].GetId()' method="post">
+  <form action='/brand/add/@Model["brand"].GetId()' method="post">
     <label for="id">Store:</label>
     <select name="id">
       @foreach (var store in @Model["stores"])
       {
-        <option value="@brand.GetId()">@store.GetName()</option>
+        <option value='@store.GetId()'>@store.GetName()</option>
       }
     </select>
     <br>

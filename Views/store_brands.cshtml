@@ -9,8 +9,7 @@ else
     @foreach (var brand in @Model["brands"])
     {
       <li>
-        @brand.GetName() |
-        <a href="/brand/@brand.GetId()/add">Add</a>
+        @brand.GetName()
       </li>
     }
   </ol>

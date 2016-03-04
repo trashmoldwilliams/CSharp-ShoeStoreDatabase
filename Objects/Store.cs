@@ -44,7 +44,7 @@ namespace ShoeStores.Objects
 
     public static List<Store> GetAll()
     {
-      var AllStores = new List<Store>{};
+      List<Store> AllStores = new List<Store>{};
 
       SqlConnection conn = DB.Connection();
       SqlDataReader rdr = null;
